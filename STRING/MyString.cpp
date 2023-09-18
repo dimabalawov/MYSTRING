@@ -1,11 +1,11 @@
-#include "MyString.h"
+﻿#include "MyString.h"
 #include <iostream>
 using namespace std;
 
 MyString::MyString()
 {
 	len = 80;
-	str = new char[80];
+	str = new char[len];
 }
 MyString::MyString(int lenght)
 {
@@ -33,6 +33,17 @@ MyString::~MyString()
 {
 	delete[] str;
 }
+void MyString::InputStr(const char* st)
+{
+	delete[] str;
+	str = new char[strlen(st)+1];
+	len = strlen(st) + 1;
+	for (size_t i = 0; i < len; i++)
+	{
+		str[i] = st[i];
+	}
+
+}
 void MyString::PrintStr() const
 {
 	for (size_t i = 0; i < len; i++)
@@ -43,6 +54,17 @@ void MyString::PrintStr() const
 ostream& operator<< (std::ostream& out, const MyString& st)
 {
 	return out<<st.str;
+}
+MyString& MyString::operator=(const MyString& b)
+{
+	delete[] str;
+	str = new char[b.len];
+	len = b.len;
+	for (size_t i = 0; i < b.len; i++)
+	{
+		str[i] = b.str[i];
+	}
+	return *this;
 }
 void MyString::MyStrcpy(const MyString& obj)
 {
@@ -123,5 +145,97 @@ int MyString::MyStrCmp(MyString& b)
 			return -1;
 	}
 	return 0;
+}
+MyString MyString::operator+(const MyString& a)
+{
+	MyString newstr(a.len+len);
+	newstr.len = a.len + len;
+	for (size_t i = 0,j=0; i < newstr.len; i++)
+	{
+		if (i < len-1)
+			newstr.str[i] = str[i];
+		else
+			newstr.str[i] = a.str[j++];
+	}
+	return newstr;
+}
+MyString MyString::operator+(int a)
+{
+	MyString newstr(a + len);
+	newstr.len = a + len;
+	int i = 0;
+	for (; i < len-1; i++)
+	{
+		newstr.str[i] = str[i];
+	}
+	for (; i < (a + len - 1); i++)
+	{
+		newstr.str[i] = ' ';
+	}
+	newstr.str[newstr.len - 1] = 0;
+	return newstr;
+}
+MyString MyString::operator+(const char* st)
+{
+	MyString newstr((strlen(st)) + len);
+	newstr.len = ((strlen(st)) + len);
+	for (size_t i = 0, j = 0; i < newstr.len; i++)
+	{
+		if (i < len-1)
+			newstr.str[i] = str[i];
+		else
+		{
+			newstr.str[i] = st[j];
+			j++;
+		}
+	}
+	return newstr;
+}
+MyString& MyString::operator++()
+{
+	char* newstr = new char[len + 1];
+	for (size_t i = 0; str[i]!=0; i++)
+	{
+		newstr[i] = str[i];
+	}
+	delete[] str;
+	newstr[len - 1] = ' ';
+	newstr[len] = 0;
+	str = newstr;
+	++len;
+	return *this;
+}
+MyString& MyString::operator++(int a)
+{
+	MyString temp(*this);
+	char* newstr = new char[len + 1];
+	for (size_t i = 0; str[i] != 0; i++)
+	{
+		newstr[i] = str[i];
+	}
+	delete[] str;
+	newstr[len - 1] = ' ';
+	newstr[len] = 0;
+	str = newstr;
+	++len;
+	return temp;
+}
+MyString& MyString::operator+=(int a)
+{
+	char* newstr = new char[len +a];
+	int i = 0;
+	for (; i < len - 1; i++)
+	{
+		newstr[i] = str[i];
+	}
+	for (size_t j = 0; j < a; j++)
+	{
+		newstr[i] = ' ';
+		i++;
+	}
+	newstr[len+a-1] = 0;
+	delete[] str;
+	str = newstr;
+	return *this;
 }
   

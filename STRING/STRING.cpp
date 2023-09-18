@@ -8,6 +8,6 @@ int main()
 {
     MyString a("Hello");
     MyString b("Hello1");
-    a = b;
-    cout << a;
+    a+=10;
+    cout << a.MyStrLen();
 }
