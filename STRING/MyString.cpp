@@ -2,6 +2,7 @@
 #include <iostream>
 using namespace std;
 
+
 MyString::MyString()
 {
 	len = 80;
@@ -14,16 +15,20 @@ MyString::MyString(int lenght)
 }
 MyString::MyString(const char* st)
 {
-	len = 1;
-	for (size_t i = 0; st[i]!=0; i++)
-	{
-		len++;
-	}
+	len = (strlen(st) + 1);
 	str = new char[len];
 	for (size_t i = 0; i < len; i++)
 	{
 		str[i] = st[i];
 	}
+}
+MyString::MyString(MyString&& b)
+{
+	len = b.len;
+	str = b.str;
+	b.len = 0;
+	b.str = nullptr;
+
 }
 MyString::MyString(const MyString& b)
 {
@@ -32,6 +37,22 @@ MyString::MyString(const MyString& b)
 MyString::~MyString()
 {
 	delete[] str;
+}
+char* MyString::getPtr() const
+{
+	return str;
+}
+int MyString::getLen() const
+{
+	return len;
+}
+void MyString::setLen(int a)
+{
+	len = a;
+}
+void MyString::setPtr(char* ptr)
+{
+	str = ptr;
 }
 void MyString::InputStr(const char* st)
 {
@@ -51,20 +72,25 @@ void MyString::PrintStr() const
 		cout << str[i];
 	}
 }
-ostream& operator<< (std::ostream& out, const MyString& st)
+ostream& operator<< (ostream& out, const MyString& st)
 {
-	return out<<st.str;
+	char* ptr = st.getPtr();
+	return out<<ptr;
 }
-MyString& MyString::operator=(const MyString& b)
+istream& operator>> (istream& in, MyString& st)
 {
-	delete[] str;
-	str = new char[b.len];
-	len = b.len;
-	for (size_t i = 0; i < b.len; i++)
+	char buffer[80];
+	in >> buffer;
+	delete[] st.getPtr();
+	char* tempptr = new char[strlen(buffer) + 1];
+	int templen = (strlen(buffer) + 1);
+	for (size_t i = 0; i < templen; i++)
 	{
-		str[i] = b.str[i];
+		tempptr[i] = buffer[i];
 	}
-	return *this;
+	st.setPtr(tempptr);
+	st.setLen(templen);
+	return in;
 }
 void MyString::MyStrcpy(const MyString& obj)
 {
@@ -145,6 +171,19 @@ int MyString::MyStrCmp(MyString& b)
 			return -1;
 	}
 	return 0;
+}
+MyString& MyString::operator=(const MyString& b)
+{
+	if (this == &b)
+		return *this;
+	delete[] str;
+	str = new char[b.len];
+	len = b.len;
+	for (size_t i = 0; i < b.len; i++)
+	{
+		str[i] = b.str[i];
+	}
+	return *this;
 }
 MyString MyString::operator+(const MyString& a)
 {
@@ -236,6 +275,113 @@ MyString& MyString::operator+=(int a)
 	newstr[len+a-1] = 0;
 	delete[] str;
 	str = newstr;
+	len += a;
 	return *this;
+}
+MyString MyString::operator-(int a)
+{
+	if (a >= len)
+	{
+		cout << "Error. strlen is less than substraction " << endl;
+		return *this;
+	}
+	MyString newstr;
+	newstr.len = (len - a);
+	newstr.str = new char[newstr.len];
+	for (size_t i = 0; i < newstr.len-1; i++)
+	{
+		newstr.str[i] = str[i];
+	}
+	newstr.str[newstr.len - 1] = 0;
+	return newstr;
+}
+MyString& MyString::operator-=(int a)
+{
+	if (a >= len)
+	{
+		cout << "Error. strlen is less than substraction " << endl;
+		return *this;
+	}
+	MyString newstr((len - a));
+	newstr.len = (len - a);
+	for (size_t i = 0; i < newstr.len - 1; i++)
+	{
+		newstr.str[i] = str[i];
+	}
+	delete[] str;
+	newstr.str[len - 1] = 0;
+	len = newstr.len;
+	str = newstr.str;
+	return *this;
+}
+MyString& MyString::operator--()
+{
+	if (len < 2)
+	{
+		cout << "Error. strlen is less than substraction " << endl;
+		return *this;
+	}
+	char* newstr = new char[len - 1];
+	for (size_t i = 0; i < len - 2; i++)
+	{
+		newstr[i] = str[i];
+	}
+	delete[] str;
+	newstr[len - 2] = 0;
+	str = newstr;
+	--len;
+	return *this;
+}
+MyString& MyString::operator--(int)
+{
+	if (len < 2)
+	{
+		cout << "Error. strlen is less than substraction " << endl;
+		return *this;
+	}
+	MyString temp = *this;
+	char* newstr = new char[len - 1];
+	for (size_t i = 0; i<len-2; i++)
+	{
+		newstr[i] = str[i];
+	}
+	delete[] str;
+	newstr[len - 2] = 0;
+	str = newstr;
+	--len;
+	return temp;
+}
+MyString& MyString::operator=(MyString&& b)
+{
+	if (this == &b)
+		return *this;
+	delete[] str;
+	len = b.len;
+	b.len = 0;
+	str = b.str;
+	b.str = nullptr;
+	return *this;
+}
+bool MyString::operator==(MyString b)
+{
+	if (MyStrCmp(b) == 0)
+		return 1;
+	else
+		return 0;
+}
+MyString& MyString::operator()(const char* a)
+{
+	delete[] str;
+	len = (strlen(a) + 1);
+	str = new char[len];
+	for (size_t i = 0; i < len; i++)
+	{
+		str[i] = a[i];
+	}
+	return *this;
+}
+char MyString::operator[](int index)
+{
+	return str[index];
 }
   
